@@ -3,15 +3,34 @@
 #include <numeric>
 #include <tuple>
 #include <string>
+#include <future>
 using namespace mochapp;
 
 int add(const std::initializer_list<int> &values)
 {
+	std::this_thread::sleep_for(std::chrono::milliseconds(30*values.size()));
 	return std::accumulate(std::begin(values), std::end(values), 0);
+	 
 }
 
-int main(int argc, char ** argv){
-	describe("add()", []() {
+struct Reporter : public details::IReporter {
+	void endReport()override {
+		std::cout << std::accumulate(count.begin(), count.end(), 0) << "tests runned in "<<
+			std::accumulate(durations.begin(), durations.end(), 0)
+			<<"ms." << std::endl;
+	}
+};
+
+
+
+using namespace std;
+
+
+int main(){
+
+	details::installReporter<Reporter>("custom");
+
+	describe.only("Add", []() {
 		using ret_t = int;
 		using arg_t = std::initializer_list<int>;
 		using test_t = std::pair<arg_t, ret_t>;
@@ -28,28 +47,44 @@ int main(int argc, char ** argv){
 		}
 		
 	});
+	describe("Loop", []() {
+		for (int i = 0; i < 50; ++i) {
+			it("test #" + std::to_string(i), [] {
+				std::this_thread::sleep_for(std::chrono::milliseconds(50 + rand() % 50));
+				Assert::isTrue(rand()%2 == 0);
+			});
+		}
+	});
 	describe("Hooks", [] {
+		
 		before([] {
-			std::cerr << details::Color::Gray <<  "// runs before all tests in this block" << std::endl; 
+			// runs before all tests in this block
 		});
-		after([] { std::cerr << details::Color::Gray << "// runs after all tests in this block" << std::endl; });
-		beforeEach([] { std::cerr << details::Color::Gray << "  // runs before each test in this block" << std::endl; });
-		afterEach([] { std::cerr << details::Color::Gray << "  // runs after each test in this block" << std::endl; });
+		after([] { 
+			// runs after all tests in this block
+		});
+		beforeEach([] { 
+			// runs before each test in this block 
+		});
+		afterEach([] { 
+			// runs after each test in this block
+		});
 
-		it("test case 1", [] {});
-		it("test case 2", [] {});
+		// test cases
+
 	});
 	describe("Uncaught exception", [] {
 		it("Should catch any exception", [] {
-			throw std::exception("really bad");
+			throw std::exception();
 		});
 	});
 	describe("Long run", [] {
 		it("Should should take some times", [] {
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			Assert::isTrue(true);
 		});
 		it("Should should take less times", [] {
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			std::this_thread::sleep_for(std::chrono::milliseconds(101));
 		});
 	});
 	describe("Assert", [] {
