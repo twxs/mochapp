@@ -1,6 +1,7 @@
 # mochapp
 Simple C++11 Header Only Test Framework Inspired by Mocha 
 
+[![Build Status](https://travis-ci.org/twxs/mochapp.svg?branch=master)](https://travis-ci.org/twxs/mochapp)
 
 ## Usage :
 
