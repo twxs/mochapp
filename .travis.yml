@@ -1,4 +1,18 @@
-
+# Ubuntu 14.04 Trusty support
+sudo: required
+dist: trusty
+addons:
+  apt:
+    sources:
+    # add PPAs with more up-to-date toolchains
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.6
+    packages:
+    # install toolchains
+    - gcc-5
+    - g++-5
+    - clang-3.6
+    
 before_install: 
   - sudo apt-get install cmake
 language: cpp
@@ -9,17 +23,8 @@ script:
   - mkdir build
   - cd build
   - cmake ..
-  - make
-#  - ctest
+  - cmake --build .
 
-#script: cmake -DJSONCPP_LIB_BUILD_SHARED=$SHARED_LIBRARY -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_VERBOSE_MAKEFILE=$VERBOSE_MAKE . && make
-#env:
-#  global:
-#    - JSONCPP_CONTINUOUS_INTERATION=1
-#  matrix:
-#    - SHARED_LIBRARY=ON BUILD_TYPE=release VERBOSE_MAKE=false
-#    - SHARED_LIBRARY=OFF BUILD_TYPE=release VERBOSE_MAKE=false
-#    - SHARED_LIBRARY=OFF BUILD_TYPE=debug VERBOSE VERBOSE_MAKE=true
 notifications:
   recipients:
     - nicolas.martin@arobas-music.com
