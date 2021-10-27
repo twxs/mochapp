@@ -25,8 +25,11 @@ struct Reporter : public details::IReporter {
 
 using namespace std;
 
-
+enum Toto {
+Totot_YO
+	};
 int main(){
+	
 
 	details::installReporter<Reporter>("custom");
 
@@ -125,5 +128,5 @@ int main(){
 		});
 	});
 
-    return 0;
+    return Totot_YO;
 }
