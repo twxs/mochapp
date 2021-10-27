@@ -202,8 +202,8 @@ struct DefaultReporter : public IReporter {
     testRunning = false;
     progressTask.wait();
 #endif
-    std::cout << details::Color::White << u8" ⁃ " << colors[status]
-              << symbols[status] << details::Color::DarkWhite << " "
+    std::cout << details::Color::White << u8" ⁃ " << colors[static_cast<int>(status)]
+              << symbols[static_cast<int>(status)] << details::Color::DarkWhite << " "
               << details::Color::White << name << " "
               << details::Color::DarkBlue << "(" << duration << "ms)"
               << std::endl;
