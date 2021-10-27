@@ -151,8 +151,8 @@ struct IReporter {
   virtual void beginDescribe(const std::string &name) {}
   virtual void endDescribe(const std::string &name) {}
   virtual void beginIt(const std::string &name) {}
-  virtual void endIt(const std::string &name, StatusStatus status, int duration) {}
-  virtual void _endIt(const std::string &name, StatusStatus status, int duration) {
+  virtual void endIt(const std::string &name, Status status, int duration) {}
+  virtual void _endIt(const std::string &name, Status status, int duration) {
     durations[static_cast<int>(status)] += duration;
     count[static_cast<int>(status)]++;
     endIt(name, status, duration);
@@ -212,7 +212,7 @@ struct DefaultReporter : public IReporter {
   void endReport() override {
     std::cout << details::Color::DarkGreen << count[static_cast<int>(Status::Success)]
               << " tests complete" << details::Color::White << " ("
-              << durations[Success] << "ms)" << std::endl;
+              << durations[Status::Success] << "ms)" << std::endl;
     std::cout << details::Color::DarkRed << count[static_cast<int>(Status::Failed)] << " tests failed"
               << details::Color::White << " (" << durations[static_cast<int>(Status::Failed)] << "ms)"
               << std::endl;
@@ -470,7 +470,7 @@ class _it {
 
 public:
   void operator()(const std::string &name) {
-    (*this)(name, [] { throw details::Pending; });
+    (*this)(name, [] { throw details::Status::Pending; });
   }
   void operator()(const std::string &name, std::function<void()> test) {
     execute(name, test);
