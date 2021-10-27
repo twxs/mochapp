@@ -118,7 +118,7 @@ static std::ostream &operator<<(std::ostream &out, Color c) {
   return out;
 }
 
-enum Status { Success, Failed, Pending, StatusCount };
+enum class Status { Success, Failed, Pending, StatusCount };
 
 // Helper ostream auto indent
 class IndentScope : public std::streambuf {
@@ -151,10 +151,10 @@ struct IReporter {
   virtual void beginDescribe(const std::string &name) {}
   virtual void endDescribe(const std::string &name) {}
   virtual void beginIt(const std::string &name) {}
-  virtual void endIt(const std::string &name, Status status, int duration) {}
-  virtual void _endIt(const std::string &name, Status status, int duration) {
-    durations[status] += duration;
-    count[status]++;
+  virtual void endIt(const std::string &name, StatusStatus status, int duration) {}
+  virtual void _endIt(const std::string &name, StatusStatus status, int duration) {
+    durations[static_cast<int>(status)] += duration;
+    count[static_cast<int>(status)]++;
     endIt(name, status, duration);
   }
   virtual void beginReport(int argc, char **argv) {}
@@ -167,11 +167,11 @@ struct DefaultReporter : public IReporter {
   std::stack<std::shared_ptr<IndentScope>> indent;
 
 #ifdef _MSC_VER
-  std::array<const char *, StatusCount> symbols{{ u8"✔", u8"✘", u8"…" }};
+  std::array<const char *, static_cast<int>(Status::StatusCount)> symbols{{ u8"✔", u8"✘", u8"…" }};
 #else
-  std::array<const char *, StatusCount> symbols{{"\u2714", "\u2718", "\u2757"}};
+  std::array<const char *, static_cast<int>(Status::StatusCount)> symbols{{"\u2714", "\u2718", "\u2757"}};
 #endif
-  std::array<Color, StatusCount> colors{
+  std::array<Color, static_cast<int>(Status::StatusCount)> colors{
       {Color::DarkGreen, Color::Red, Color::Purple}};
 
   void beginDescribe(const std::string &name) override {
@@ -210,14 +210,14 @@ struct DefaultReporter : public IReporter {
   }
   void beginReport(int argc, char **argv) {}
   void endReport() override {
-    std::cout << details::Color::DarkGreen << count[Success]
+    std::cout << details::Color::DarkGreen << count[static_cast<int>(Status::Success)]
               << " tests complete" << details::Color::White << " ("
               << durations[Success] << "ms)" << std::endl;
-    std::cout << details::Color::DarkRed << count[Failed] << " tests failed"
-              << details::Color::White << " (" << durations[Failed] << "ms)"
+    std::cout << details::Color::DarkRed << count[static_cast<int>(Status::Failed)] << " tests failed"
+              << details::Color::White << " (" << durations[static_cast<int>(Status::Failed)] << "ms)"
               << std::endl;
-    std::cout << details::Color::DarkBlue << count[Pending] << " tests pending"
-              << details::Color::White << " (" << durations[Pending] << "ms)"
+    std::cout << details::Color::DarkBlue << count[static_cast<int>(Status::Pending)] << " tests pending"
+              << details::Color::White << " (" << durations[static_cast<int>(Status::Pending)] << "ms)"
               << std::endl;
     std::cout << "Finished" << std::endl;
   }
@@ -448,7 +448,7 @@ class _it {
       ctx.beforeEach();
     }
     int duration{0};
-    details::Status status{details::Pending};
+    details::Status status{details::Status::Pending};
     details::mocha().reporter->beginIt(name);
     try {
       {
@@ -456,11 +456,11 @@ class _it {
         test();
       }
     } catch (details::TestSuccess &) {
-      status = details::Success;
+      status = details::Status::Success;
     } catch (details::TestFailure &) {
-      status = details::Failed;
+      status = details::Status::Failed;
     } catch (...) {
-      status = details::Failed;
+      status = details::Status::Failed;
     }
     details::mocha().reporter->_endIt(name, status, duration);
     if (ctx.afterEach) {
