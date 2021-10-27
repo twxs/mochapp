@@ -212,7 +212,7 @@ struct DefaultReporter : public IReporter {
   void endReport() override {
     std::cout << details::Color::DarkGreen << count[static_cast<int>(Status::Success)]
               << " tests complete" << details::Color::White << " ("
-              << durations[Status::Success] << "ms)" << std::endl;
+              << durations[static_cast<int>(Status::Success)] << "ms)" << std::endl;
     std::cout << details::Color::DarkRed << count[static_cast<int>(Status::Failed)] << " tests failed"
               << details::Color::White << " (" << durations[static_cast<int>(Status::Failed)] << "ms)"
               << std::endl;
