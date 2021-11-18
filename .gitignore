@@ -31,3 +31,4 @@
 build*
 mochawatcher
 .BROWSE.VC.DB*
+.vscode
