@@ -21,8 +21,6 @@ struct Reporter : public details::IReporter {
 	}
 };
 
-
-
 using namespace std;
 
 enum Toto {
